@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安心吃菌</title>
+    <style>
+        .logo {
+            display: block;
+            margin: 10px auto 20px; /* 上下边距10px，右边距auto，下方增加20px间距 */
+            max-width: 100%;
+            height: auto;
+        }
+        /* 模态窗口的样式 */
+        .modal {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4); /* 背景色 */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+        function forgotPassword() {
+            var username = document.getElementById('username').value;
+            if (username === '') {
+                alert('请输入用户名以检索密码');
+                return;
+            }
+            fetch(`/user/forgot_password?username=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 0) {
+                        alert(`您的密码是: ${data.password}`);
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+    </script>
+</head>
+<body style="margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; background: url('{{ url_for('static', filename='images/loginback2.jpg') }}') no-repeat center center fixed; background-size: cover;">
+    <div class="container" style="background-color: rgba(255, 255, 255, 0.8); padding: 40px 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); text-align: center; width: 90%; max-width: 400px; margin-top: 10px;">
+        <div class="login-box">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+            <h1 style="font-size: 2em; margin-bottom: 0.5em;">立刻登录</h1>
+            <h2 style="font-size: 1.5em; margin-bottom: 1em;">认识你的菌子</h2>
+            <p style="font-size: 1em; margin-bottom: 1.5em;">现在就上传你的图片，让AI看看你的菌子是否能吃~</p>
+            <form action="{{ url_for('user.login') }}" method="POST">
+                <input type="text" id="username" name="username" placeholder="请输入用户名" style="width: calc(100% - 20px); padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+                <input type="password" name="password" placeholder="请输入密码" style="width: calc(100% - 20px); padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button type="submit" class="main-button" style="width: 100%; padding: 10px 20px; border: none; border-radius: 5px; background-color: #333; color: #fff; font-size: 1em; cursor: pointer;">登录</button>
+                    <a href="javascript:void(0);" onclick="forgotPassword()" class="forgot-password" style="display: block; margin-top: 10px; color: #333; text-decoration: none;">忘记密码</a>
+                </div>
+                <div class="register-link" style="margin-top: 20px;">
+                    <p style="font-size: 1em; color: #333;">您还没有账号？ <a href="{{ url_for('user.register') }}" style="color: #007BFF; text-decoration: none;">立即注册</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if message %}
+    <script>
+        alert("{{ message }}");
+    </script>
+    {% endif %}
+
+    <!-- 模态窗口 -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-title">提示</div>
+            <p id="modal-message"></p>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                // 显示模态窗口
+                function showModal(message) {
+                    var modal = document.getElementById("myModal");
+                    var modalMessage = document.getElementById("modal-message");
+                    var span = document.getElementsByClassName("close")[0];
+
+                    modalMessage.textContent = message;
+                    modal.style.display = "block";
+
+                    // 点击 <span> (x) 关闭模态窗口
+                    span.onclick = function() {
+                        modal.style.display = "none";
+                    }
+
+                    // 点击模态窗口外部关闭模态窗口
+                    window.onclick = function(event) {
+                        if (event.target == modal) {
+                            modal.style.display = "none";
+                        }
+                    }
+                }
+
+                // 获取消息并显示模态窗口
+                {% for category, message in messages %}
+                    showModal("{{ message }}");
+                {% endfor %}
+            </script>
+        {% endif %}
+    {% endwith %}
+</body>
+</html>

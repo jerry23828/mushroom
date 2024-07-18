@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>检测记录</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>检测记录</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>检测时间</th>
+            <th>检测结果</th>
+            <th>置信度</th>
+            <th>图片</th>
+            <th>使用模型</th>
+        </tr>
+        {% for record in records %}
+        <tr>
+            <td>{{ record.id }}</td>
+            <td>{{ record.detection_time }}</td>
+            <td>{{ record.predicted_class }}</td>
+            <td>{{ record.confidence }}</td>
+            <td><img src="{{ url_for('static', filename=record.image_path) }}" alt="检测图片"></td>
+            <td>{{ record.model_used }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="mrclassify-link" style="margin-top: 20px;">
+        <p style="font-size: 1em; color: #333;">展示完毕<a href="{{ url_for('user.dashboard') }}" style="color: #007BFF; text-decoration: none;">返回</a></p>
+    </div>
+</body>
+</html>
